@@ -3,14 +3,15 @@
 #include <arpa/inet.h>
 #include <unistd.h>
 #include <string.h>
+using namespace std;
 
-#define PORT 12345
+#define PORT 8080
 #define BUFSIZE 1024
 
 int main() {
     int sock = socket(AF_INET, SOCK_DGRAM, 0);
     if (sock < 0) {
-        std::cerr << "Socket creation failed" << std::endl;
+        cerr << "Socket creation failed" << endl;
         return 1;
     }
 
@@ -21,11 +22,11 @@ int main() {
     server_addr.sin_port = htons(PORT);
 
     if (bind(sock, (struct sockaddr*)&server_addr, sizeof(server_addr)) < 0) {
-        std::cerr << "Bind failed" << std::endl;
+        cerr << "Bind failed" << endl;
         return 1;
     }
 
-    std::cout << "Server is running on port " << PORT << std::endl;
+    cout << "Server is running and waiting for connections on port " << PORT << endl;
 
     char buffer[BUFSIZE];
     while (true) {
@@ -34,16 +35,16 @@ int main() {
                               (struct sockaddr*)&client_addr, &len);
 
         if (received < 0) {
-            std::cerr << "Error receiving data" << std::endl;
+            cerr << "Error receiving data" << endl;
             continue;
         }
 
         buffer[received] = '\0';
-        std::cout << "Received: " << buffer << " from "
-                  << inet_ntoa(client_addr.sin_addr) << std::endl;
+        cout << "Received: " << buffer << " from "
+                  << inet_ntoa(client_addr.sin_addr) << endl;
 
         // Send pong response
-        std::string response = "PONG " + std::string(buffer + 5);  // Skip "PING "
+        string response = "PONG " + string(buffer + 5);  // Skip "PING "
         sendto(sock, response.c_str(), response.length(), 0,
                (struct sockaddr*)&client_addr, len);
     }
