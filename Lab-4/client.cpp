@@ -4,6 +4,8 @@
 #include <arpa/inet.h>
 #include <unistd.h>
 
+using namespace std;
+
 #define PORT 8080
 #define BUFFER_SIZE 1024
 
@@ -14,7 +16,7 @@ int main() {
 
     // Create socket file descriptor
     if ((sock = socket(AF_INET, SOCK_STREAM, 0)) < 0) {
-        std::cerr << "Socket creation error" << std::endl;
+        cerr << "Socket creation error" << endl;
         return -1;
     }
 
@@ -24,24 +26,24 @@ int main() {
 
     // Convert IPv4 and IPv6 addresses from text to binary form
     if (inet_pton(AF_INET, "127.0.0.1", &serv_addr.sin_addr) <= 0) {
-        std::cerr << "Invalid address/ Address not supported" << std::endl;
+        cerr << "Invalid address/ Address not supported" << endl;
         return -1;
     }
 
     // Connect to the server
     if (connect(sock, (struct sockaddr *)&serv_addr, sizeof(serv_addr)) < 0) {
-        std::cerr << "Connection Failed" << std::endl;
+        cerr << "Connection Failed" << endl;
         return -1;
     }
 
     // Receive and display server information
     int valread = read(sock, buffer, BUFFER_SIZE);
-    std::cout << "Server Info:\n" << buffer << std::endl;
+    cout << "Server Info:\n" << buffer << endl;
 
     while(true) {
-        std::string command;
-        std::cout << "Enter command (or 'exit' to quit): ";
-        std::getline(std::cin, command);
+        string command;
+        cout << "Enter command (or 'exit' to quit): ";
+        getline(cin, command);
 
         if (command == "exit") break;
 
@@ -50,7 +52,7 @@ int main() {
         memset(buffer, 0, BUFFER_SIZE);
         // Receive and display server response
         valread = read(sock, buffer, BUFFER_SIZE);
-        std::cout << "Server response:\n" << buffer << std::endl;
+        cout << "Server response:\n" << buffer << endl;
     }
 
     // Close the connected socket
